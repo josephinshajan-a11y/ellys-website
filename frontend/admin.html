@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ellys Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            background: #f5efe7;
+        }
+
+        /* LOGIN PAGE STYLES */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #8b1538 0%, #5c0a1f 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .login-box h1 {
+            text-align: center;
+            color: #8b1538;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .login-box .tagline {
+            text-align: center;
+            color: #d4af37;
+            margin-bottom: 30px;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .login-box p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-box label {
+            display: block;
+            color: #8b1538;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: 'Lora', serif;
+            transition: border-color 0.3s;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #8b1538;
+            box-shadow: 0 0 8px rgba(139, 21, 56, 0.2);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 14px;
+            background: #8b1538;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: 'Lora', serif;
+            margin-top: 20px;
+        }
+
+        .login-box button:hover {
+            background: #5c0a1f;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* DASHBOARD STYLES */
+        .dashboard-container {
+            display: none;
+        }
+
+        .dashboard-container.logged-in {
+            display: block;
+        }
+
+        .login-container.logged-in {
+            display: none;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #8b1538 0%, #5c0a1f 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .dashboard-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #d4af37;
+            color: #8b1538;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Lora', serif;
+        }
+
+        .logout-btn:hover {
+            background: #c9a227;
+        }
+
+        .dashboard-content {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: #fffaf0;
+            color: #8b1538;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-family: 'Lora', serif;
+        }
+
+        .tab-btn:hover {
+            background: #f0e6d2;
+        }
+
+        .tab-btn.active {
+            color: #8b1538;
+            border-bottom-color: #8b1538;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-container h3 {
+            color: #8b1538;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            color: #8b1538;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Lora', serif;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #8b1538;
+            box-shadow: 0 0 5px rgba(139, 21, 56, 0.2);
+        }
+
+        .form-btn {
+            background: #8b1538;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Lora', serif;
+            transition: background 0.3s;
+        }
+
+        .form-btn:hover {
+            background: #5c0a1f;
+        }
+
+        .products-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .products-container h3 {
+            color: #8b1538;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .product-item {
+            display: grid;
+            grid-template-columns: 100px 1fr 150px;
+            gap: 20px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .product-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .product-details h4 {
+            color: #8b1538;
+            margin-bottom: 5px;
+        }
+
+        .product-details p {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-btn,
+        .delete-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Lora', serif;
+            transition: all 0.3s;
+        }
+
+        .edit-btn {
+            background: #d4af37;
+            color: #8b1538;
+        }
+
+        .edit-btn:hover {
+            background: #c9a227;
+        }
+
+        .delete-btn {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #b71c1c;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .login-box {
+                padding: 30px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .product-item {
+                grid-template-columns: 1fr;
+            }
+
+            .logout-btn {
+                position: static;
+                margin-top: 20px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN CONTAINER -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h1>Ellys by Elizabeth</h1>
+            <p class="tagline">Threads of Tradition, Shades of Tomorrow</p>
+            <p>Admin Dashboard Login</p>
+            
+            <div class="form-group">
+                <label>Admin ID</label>
+                <input type="text" id="adminId" placeholder="Enter Admin ID" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter Password" required>
+            </div>
+
+            <button onclick="validateLogin()">Login</button>
+            
+            <div class="error-message" id="loginError"></div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD CONTAINER -->
+    <div class="dashboard-container" id="dashboardContainer">
+        <button class="logout-btn" onclick="logout()">Logout</button>
+        
+        <div class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <p>Manage your Sarees & Jewellery products</p>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- TABS -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('sarees')">👗 Manage Sarees</button>
+                <button class="tab-btn" onclick="showTab('jewellery')">💎 Manage Jewellery</button>
+            </div>
+
+            <!-- SUCCESS MESSAGE -->
+            <div class="success-message" id="successMessage"></div>
+
+            <!-- SAREES TAB -->
+            <div class="tab-content active" id="sarees-tab">
+                <!-- Add Saree Form -->
+                <div class="form-container">
+                    <h3>Add New Saree</h3>
+                    <form id="sareeForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Saree Name</label>
+                                <input type="text" id="sareeName" placeholder="e.g., Silk Saree" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Price (₹)</label>
+                                <input type="number" id="sareePrice" placeholder="e.g., 5000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="sareeCategory" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Silk">Silk</option>
+                                    <option value="Banarasi">Banarasi</option>
+                                    <option value="Party Wear">Party Wear</option>
+                                    <option value="Bridal">Bridal</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Rating</label>
+                                <input type="number" id="sareeRating" min="1" max="5" placeholder="1-5" value="5">
+                            </div>
+                        </div>
+
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="sareeDescription" placeholder="Describe the saree..." required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label>Upload Image</label>
+                                <input type="file" id="sareeImage" accept="image/*" required>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="addSaree()" class="form-btn">Add Saree</button>
+                    </form>
+                </div>
+
+                <!-- Sarees List -->
+                <div class="products-container">
+                    <h3>Current Sarees</h3>
+                    <div id="sareesList"></div>
+                </div>
+            </div>
+
+            <!-- JEWELLERY TAB -->
+            <div class="tab-content" id="jewellery-tab">
+                <!-- Add Jewellery Form -->
+                <div class="form-container">
+                    <h3>Add New Jewellery</h3>
+                    <form id="jewelleryForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Jewellery Name</label>
+                                <input type="text" id="jewelleryName" placeholder="e.g., Gold Earrings" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Price (₹)</label>
+                                <input type="number" id="jewelleryPrice" placeholder="e.g., 2000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="jewelleryCategory" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Earrings">Earrings</option>
+                                    <option value="Necklaces">Necklaces</option>
+                                    <option value="Bangles">Bangles</option>
+                                    <option value="Sets">Sets</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Material</label>
+                                <select id="jewelleryMaterial" required>
+                                    <option value="">Select Material</option>
+                                    <option value="Gold">Gold</option>
+                                    <option value="Silver">Silver</option>
+                                    <option value="Pearl">Pearl</option>
+                                    <option value="Crystal">Crystal</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Rating</label>
+                                <input type="number" id="jewelleryRating" min="1" max="5" placeholder="1-5" value="5">
+                            </div>
+                        </div>
+
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="jewelleryDescription" placeholder="Describe the jewellery..." required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label>Upload Image</label>
+                                <input type="file" id="jewelleryImage" accept="image/*" required>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="addJewellery()" class="form-btn">Add Jewellery</button>
+                    </form>
+                </div>
+
+                <!-- Jewellery List -->
+                <div class="products-container">
+                    <h3>Current Jewellery</h3>
+                    <div id="jewelleryList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

@@ -21,7 +21,6 @@
                 <li><a href="jewellery.html">Jewellery</a></li>
                 <li><a href="about.html">About</a></li>
                 <li><a href="contact.html">Contact</a></li>
-                <li><a href="admin.html" target="_blank">Admin</a></li>
             </ul>
 
             <div class="nav-icons">
@@ -33,8 +32,8 @@
 
     <!-- CONTACT SECTION -->
     <section class="contact-section">
-        <h2>📧 Contact Us</h2>
-        <p class="section-subtitle">We'd love to hear from you!</p>
+        <h2>📧 Get In Touch</h2>
+        <p class="section-subtitle">Have questions about our collections? Want to place a bulk order? Reach out to us via email, phone, or WhatsApp. We're here to help and excited to connect with you!</p>
 
         <div class="contact-container">
             <!-- Contact Form -->
@@ -43,12 +42,12 @@
                 
                 <div class="form-group">
                     <label>Your Name</label>
-                    <input type="text" id="name" placeholder="Enter your name" required>
+                    <input type="text" id="name" placeholder="Enter your full name" required>
                 </div>
 
                 <div class="form-group">
                     <label>Your Email</label>
-                    <input type="email" id="email" placeholder="Enter your email" required>
+                    <input type="email" id="email" placeholder="Enter your email address" required>
                 </div>
 
                 <div class="form-group">
@@ -58,7 +57,7 @@
 
                 <div class="form-group">
                     <label>Message</label>
-                    <textarea id="message" placeholder="Your message..." rows="5" required></textarea>
+                    <textarea id="message" placeholder="Tell us more about your inquiry..." rows="5" required></textarea>
                 </div>
 
                 <button type="submit" class="form-btn">Send Message</button>
@@ -73,27 +72,32 @@
 
                 <div class="info-box">
                     <h3>📞 Phone</h3>
-                    <p>+44 7586 181193</p>
+                    <p><a href="tel:+447586181193">+44 7586 181193</a></p>
+                    <p style="font-size: 13px; color: #999; margin-top: 8px;">Call or WhatsApp us anytime!</p>
                 </div>
 
                 <div class="info-box">
                     <h3>📧 Email</h3>
-                    <p>hello@ellys.com</p>
-                </div>
-
-                <div class="info-box">
-                    <h3>📱 Instagram</h3>
-                    <p><a href="https://www.instagram.com/ellys_elizabeth?igsh=MWppa2dmamZoOTFrcA==" target="_blank">@ellys_elizabeth</a></p>
-                </div>
-
-                <div class="info-box">
-                    <h3>⏰ Hours</h3>
-                    <p>Monday - Friday: 10 AM - 6 PM<br>Saturday - Sunday: 11 AM - 5 PM</p>
+                    <p><a href="mailto:hello@ellys.com">hello@ellys.com</a></p>
+                    <p style="font-size: 13px; color: #999; margin-top: 8px;">We'll respond within 24 hours</p>
                 </div>
 
                 <div class="info-box">
                     <h3>💬 WhatsApp</h3>
                     <p><a href="https://wa.me/447586181193" target="_blank">Chat with us on WhatsApp</a></p>
+                    <p style="font-size: 13px; color: #999; margin-top: 8px;">Quick responses & order updates</p>
+                </div>
+
+                <div class="info-box">
+                    <h3>📱 Instagram</h3>
+                    <p><a href="https://www.instagram.com/ellys_elizabeth?igsh=MWppa2dmamZoOTFrcA==" target="_blank">@ellys_elizabeth</a></p>
+                    <p style="font-size: 13px; color: #999; margin-top: 8px;">Follow for latest collections & updates</p>
+                </div>
+
+                <div class="info-box">
+                    <h3>⏰ Business Hours</h3>
+                    <p>Monday - Friday: 10 AM - 6 PM<br>Saturday - Sunday: 11 AM - 5 PM</p>
+                    <p style="font-size: 13px; color: #999; margin-top: 8px;">UK Time (GMT/BST)</p>
                 </div>
             </div>
         </div>
@@ -102,7 +106,7 @@
     <!-- FOOTER -->
     <footer>
         <p>&copy; 2024 Ellys by Elizabeth. All rights reserved.</p>
-        <p><a href="https://www.instagram.com/ellys_elizabeth?igsh=MWppa2dmamZoOTFrcA==" target="_blank">📱 Follow us on Instagram</a></p>
+        <p><a href="https://www.instagram.com/ellys_elizabeth?igsh=MWppa2dmamZoOTFrcA==" target="_blank">📱 Follow us on Instagram</a> | <a href="contact.html">Contact Us</a></p>
     </footer>
 
     <!-- CART MODAL -->
@@ -120,9 +124,12 @@
 
     <script src="script.js"></script>
     <script>
-        // Load cart on page load
         document.addEventListener('DOMContentLoaded', function() {
             updateCartCount();
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', sendContactMessage);
+            }
         });
     </script>
 </body>

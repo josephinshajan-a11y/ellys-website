@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Ellys by Elizabeth</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>Ellys</h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="sarees.html">Sarees</a></li>
+                <li><a href="jewellery.html">Jewellery</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+
+            <div class="nav-icons">
+                <span class="cart-badge" id="cartBadge">0</span>
+                <button onclick="openCart()" class="cart-btn">🛒</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ABOUT SECTION -->
+    <section class="about-section">
+        <div class="about-container">
+            <h1>About Ellys by Elizabeth</h1>
+            <p class="tagline">Threads of Tradition, Shades of Tomorrow</p>
+
+            <!-- Our Story -->
+            <div class="about-content">
+                <h2>Our Story</h2>
+                <p>
+                    Ellys by Elizabeth is born from a passion for traditional craftsmanship and contemporary elegance. Founded with the vision to bring the finest sarees and jewellery to discerning customers worldwide, we celebrate the artistry and dedication of master craftspeople.
+                </p>
+                <p>
+                    Each saree in our collection is carefully sourced from renowned weavers across India, ensuring authenticity and uncompromising quality. Our jewellery pieces are selected to complement the grace and beauty of our sarees, creating complete ensembles that honor tradition while embracing modern aesthetics.
+                </p>
+            </div>
+
+            <!-- Mission & Vision -->
+            <div class="about-content">
+                <h2>Our Mission</h2>
+                <p>
+                    To provide access to premium, handcrafted sarees and jewellery that celebrate cultural heritage while meeting contemporary fashion standards. We are committed to supporting traditional artisans and making their exceptional work accessible to a global audience who appreciates true craftsmanship.
+                </p>
+            </div>
+
+            <div class="about-content">
+                <h2>Our Vision</h2>
+                <p>
+                    To become the trusted destination for those seeking authentic, high-quality traditional attire and accessories. We envision a world where traditional craftsmanship is valued, celebrated, and preserved for future generations—where every purchase supports artisans and their families.
+                </p>
+            </div>
+
+            <!-- Values -->
+            <div class="values-section">
+                <h2>Our Core Values</h2>
+                <div class="values-grid">
+                    <div class="value-box">
+                        <h3>✨ Quality First</h3>
+                        <p>We never compromise on quality. Every piece is inspected with meticulous care to ensure it meets our high standards.</p>
+                    </div>
+                    <div class="value-box">
+                        <h3>🎨 Authentic Craftsmanship</h3>
+                        <p>We celebrate genuine, traditional techniques perfected over generations. Handwoven, hand-crafted, and made with heart.</p>
+                    </div>
+                    <div class="value-box">
+                        <h3>💝 Customer First</h3>
+                        <p>Your satisfaction is our priority. We're here to support you at every step of your journey with us.</p>
+                    </div>
+                    <div class="value-box">
+                        <h3>🌍 Ethical & Sustainable</h3>
+                        <p>We support ethical sourcing and artisans who practice sustainable craftsmanship. Every purchase makes a difference.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Founder -->
+            <div class="about-content">
+                <h2>Meet Elizabeth</h2>
+                <p>
+                    Elizabeth, the founder of Ellys by Elizabeth, is a passionate advocate for traditional textiles and jewelry arts. With years of experience connecting artisans with customers worldwide, she established Ellys to create a platform where quality and tradition meet modern accessibility.
+                </p>
+                <p>
+                    Her dedication to preserving cultural heritage while embracing contemporary commerce has made Ellys a trusted name among those who appreciate fine craftsmanship and authentic beauty.
+                </p>
+            </div>
+
+            <!-- Why Choose Us -->
+            <div class="about-content">
+                <h2>Why Choose Ellys by Elizabeth?</h2>
+                <ul class="why-list">
+                    <li>✅ Handpicked collections from the finest artisans across India</li>
+                    <li>✅ Authentic, premium-quality products with certificates of authenticity</li>
+                    <li>✅ Fair pricing that supports artisans and their families</li>
+                    <li>✅ Secure and convenient online shopping experience</li>
+                    <li>✅ Dedicated customer support in multiple languages</li>
+                    <li>✅ Commitment to ethical and sustainable practices</li>
+                    <li>✅ Fast and reliable international delivery</li>
+                    <li>✅ 30-day returns and satisfaction guarantee</li>
+                </ul>
+            </div>
+
+            <!-- Contact CTA -->
+            <div class="about-cta">
+                <h2>Ready to Experience Ellys?</h2>
+                <p>Browse our collections today and discover the perfect saree or jewellery piece for you.</p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="sarees.html" class="cta-btn">Shop Sarees</a>
+                    <a href="jewellery.html" class="cta-btn">Shop Jewellery</a>
+                    <a href="contact.html" class="cta-btn secondary">Get In Touch</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2024 Ellys by Elizabeth. All rights reserved.</p>
+        <p><a href="https://www.instagram.com/ellys_elizabeth?igsh=MWppa2dmamZoOTFrcA==" target="_blank">📱 Follow us on Instagram</a> | <a href="contact.html">Contact Us</a></p>
+    </footer>
+
+    <!-- CART MODAL -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCart()">&times;</span>
+            <h2>Shopping Cart</h2>
+            <div id="cartItemsList"></div>
+            <div class="cart-total">
+                <h3>Total: ₹<span id="cartTotal">0</span></h3>
+            </div>
+            <button onclick="checkout()" class="checkout-btn">Proceed to WhatsApp</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+        });
+    </script>
+</body>
+</html>

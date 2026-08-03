@@ -1,9 +1,7 @@
 // ===== API CONFIGURATION =====
-// For local testing: http://localhost:3000/.netlify/functions
-// For Netlify: /.netlify/functions
 const API_BASE = '/.netlify/functions';
-
 const WHATSAPP_NUMBER = '447586181193';
+const EMAIL = 'ellysbyelizabeth@gmail.com';
 
 // ===== CART MANAGEMENT =====
 let cart = JSON.parse(localStorage.getItem('ellysCart')) || [];
@@ -45,7 +43,7 @@ function displayCart() {
     const cartTotalSpan = document.getElementById('cartTotal');
 
     if (cart.length === 0) {
-        cartItemsDiv.innerHTML = '<p style="text-align: center; color: #999;">Your cart is empty</p>';
+        cartItemsDiv.innerHTML = '<p style="text-align: center; color: #999;">Your cart is empty. Start shopping!</p>';
         cartTotalSpan.textContent = '0';
         return;
     }
@@ -59,7 +57,7 @@ function displayCart() {
                     <p><strong>${item.name}</strong></p>
                     <p style="color: #666; font-size: 14px;">₹${item.price} (${item.type})</p>
                 </div>
-                <button onclick="removeFromCart(${index})" style="background: #d32f2f; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 5px;">Remove</button>
+                <button onclick="removeFromCart(${index})" style="background: #d32f2f; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 5px; font-weight: bold;">Remove</button>
             </div>
         `;
     }).join('');
@@ -105,35 +103,50 @@ function checkout() {
     localStorage.setItem('ellysCart', JSON.stringify(cart));
     updateCartCount();
     closeCart();
+    showNotification('Order sent! Check your WhatsApp 📱');
 }
 
 // ===== FETCH PRODUCTS =====
 async function fetchSarees() {
     try {
+        console.log('Fetching sarees from:', API_BASE + '/sarees');
         const response = await fetch(`${API_BASE}/sarees`);
-        if (!response.ok) throw new Error('Failed to fetch sarees');
+        
+        if (!response.ok) {
+            console.error('Sarees fetch failed:', response.status);
+            throw new Error('Failed to fetch sarees');
+        }
+        
         const sarees = await response.json();
+        console.log('Sarees loaded:', sarees.length);
         displaySarees(sarees);
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error loading sarees:', error);
         const grid = document.getElementById('sareesGrid');
         if (grid) {
-            grid.innerHTML = '<p>Error loading sarees. Please refresh the page.</p>';
+            grid.innerHTML = '<p style="text-align: center; color: #d32f2f; padding: 40px;">Error loading products. Please refresh the page. ' + error.message + '</p>';
         }
     }
 }
 
 async function fetchJewellery() {
     try {
+        console.log('Fetching jewellery from:', API_BASE + '/jewellery');
         const response = await fetch(`${API_BASE}/jewellery`);
-        if (!response.ok) throw new Error('Failed to fetch jewellery');
+        
+        if (!response.ok) {
+            console.error('Jewellery fetch failed:', response.status);
+            throw new Error('Failed to fetch jewellery');
+        }
+        
         const jewellery = await response.json();
+        console.log('Jewellery loaded:', jewellery.length);
         displayJewellery(jewellery);
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error loading jewellery:', error);
         const grid = document.getElementById('jewelleryGrid');
         if (grid) {
-            grid.innerHTML = '<p>Error loading jewellery. Please refresh the page.</p>';
+            grid.innerHTML = '<p style="text-align: center; color: #d32f2f; padding: 40px;">Error loading products. Please refresh the page. ' + error.message + '</p>';
         }
     }
 }
@@ -144,16 +157,18 @@ function displaySarees(sarees) {
     if (!grid) return;
     
     if (sarees.length === 0) {
-        grid.innerHTML = '<p style="text-align: center;">No sarees available.</p>';
+        grid.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No sarees available yet. Check back soon!</p>';
         return;
     }
 
     grid.innerHTML = sarees.map(saree => `
         <div class="product-card">
-            <img src="${saree.image}" alt="${saree.name}" class="product-image">
+            <div class="product-image-container">
+                <img src="${saree.image || 'https://via.placeholder.com/250x300?text=Saree'}" alt="${saree.name}" class="product-image" onerror="this.src='https://via.placeholder.com/250x300?text=Saree'">
+            </div>
             <h3>${saree.name}</h3>
             <p class="category">${saree.category}</p>
-            <p class="description">${saree.description.substring(0, 60)}...</p>
+            <p class="description">${(saree.description || 'Premium saree').substring(0, 60)}...</p>
             <div class="product-footer">
                 <span class="price">₹${saree.price}</span>
                 <button onclick="addToCart('${saree._id}', '${saree.name}', ${saree.price}, 'saree')" class="add-btn">Add to Cart</button>
@@ -167,16 +182,18 @@ function displayJewellery(jewellery) {
     if (!grid) return;
     
     if (jewellery.length === 0) {
-        grid.innerHTML = '<p style="text-align: center;">No jewellery available.</p>';
+        grid.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No jewellery available yet. Check back soon!</p>';
         return;
     }
 
     grid.innerHTML = jewellery.map(item => `
         <div class="product-card">
-            <img src="${item.image}" alt="${item.name}" class="product-image">
+            <div class="product-image-container">
+                <img src="${item.image || 'https://via.placeholder.com/250x300?text=Jewellery'}" alt="${item.name}" class="product-image" onerror="this.src='https://via.placeholder.com/250x300?text=Jewellery'">
+            </div>
             <h3>${item.name}</h3>
             <p class="category">${item.category} • ${item.material}</p>
-            <p class="description">${item.description.substring(0, 60)}...</p>
+            <p class="description">${(item.description || 'Premium jewellery').substring(0, 60)}...</p>
             <div class="product-footer">
                 <span class="price">₹${item.price}</span>
                 <button onclick="addToCart('${item._id}', '${item.name}', ${item.price}, 'jewellery')" class="add-btn">Add to Cart</button>
@@ -245,6 +262,7 @@ function showNotification(message) {
         border-radius: 5px;
         z-index: 9999;
         animation: slideIn 0.3s ease;
+        font-weight: bold;
     `;
 
     document.body.appendChild(notification);
@@ -281,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
         contactForm.addEventListener('submit', sendContactMessage);
     }
     
-    console.log('✅ Store loaded successfully!');
+    console.log('✅ Ellys store loaded successfully!');
     console.log('API Base:', API_BASE);
 });
 
@@ -308,6 +326,22 @@ style.textContent = `
             transform: translateX(400px);
             opacity: 0;
         }
+    }
+
+    .product-image-container {
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        background: #f5efe7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 `;
 document.head.appendChild(style);

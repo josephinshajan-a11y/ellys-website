@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jewellery - Ellys by Elizabeth</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>Ellys</h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="sarees.html">Sarees</a></li>
+                <li><a href="jewellery.html">Jewellery</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html" target="_blank">Admin</a></li>
+            </ul>
+
+            <div class="nav-icons">
+                <span class="cart-badge" id="cartBadge">0</span>
+                <button onclick="openCart()" class="cart-btn">🛒</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- JEWELLERY SECTION -->
+    <section class="products-section">
+        <h2>💎 Our Jewellery Collection</h2>
+        <p class="section-subtitle">Elegant jewellery pieces for every occasion</p>
+        <div class="products-grid" id="jewelleryGrid"></div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2024 Ellys by Elizabeth. All rights reserved.</p>
+        <p><a href="https://www.instagram.com/ellys_elizabeth?igsh=MWppa2dmamZoOTFrcA==" target="_blank">📱 Follow us on Instagram</a></p>
+    </footer>
+
+    <!-- CART MODAL -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCart()">&times;</span>
+            <h2>Shopping Cart</h2>
+            <div id="cartItemsList"></div>
+            <div class="cart-total">
+                <h3>Total: ₹<span id="cartTotal">0</span></h3>
+            </div>
+            <button onclick="checkout()" class="checkout-btn">Proceed to WhatsApp</button>
+        </div>
+    </div>
+
+    <!-- WHATSAPP STICKY BUTTON -->
+    <div id="whatsappButton" class="whatsapp-button" style="display: none;">
+        <a href="https://wa.me/447586181193" target="_blank">💬 Chat on WhatsApp</a>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Load jewellery on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchJewellery();
+            updateCartCount();
+            toggleWhatsAppSection();
+        });
+    </script>
+</body>
+</html>

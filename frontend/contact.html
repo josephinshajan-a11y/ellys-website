@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Ellys by Elizabeth</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>Ellys</h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="sarees.html">Sarees</a></li>
+                <li><a href="jewellery.html">Jewellery</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html" target="_blank">Admin</a></li>
+            </ul>
+
+            <div class="nav-icons">
+                <span class="cart-badge" id="cartBadge">0</span>
+                <button onclick="openCart()" class="cart-btn">🛒</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact-section">
+        <h2>📧 Contact Us</h2>
+        <p class="section-subtitle">We'd love to hear from you!</p>
+
+        <div class="contact-container">
+            <!-- Contact Form -->
+            <form class="contact-form" id="contactForm">
+                <h3>Send us a Message</h3>
+                
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="name" placeholder="Enter your name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Email</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" id="subject" placeholder="What is this about?" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="message" placeholder="Your message..." rows="5" required></textarea>
+                </div>
+
+                <button type="submit" class="form-btn">Send Message</button>
+            </form>
+
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <div class="info-box">
+                    <h3>📍 Location</h3>
+                    <p>11 River Heights<br>London, UK</p>
+                </div>
+
+                <div class="info-box">
+                    <h3>📞 Phone</h3>
+                    <p>+44 7586 181193</p>
+                </div>
+
+                <div class="info-box">
+                    <h3>📧 Email</h3>
+                    <p>hello@ellys.com</p>
+                </div>
+
+                <div class="info-box">
+                    <h3>📱 Instagram</h3>
+                    <p><a href="https://www.instagram.com/ellys_elizabeth?igsh=MWppa2dmamZoOTFrcA==" target="_blank">@ellys_elizabeth</a></p>
+                </div>
+
+                <div class="info-box">
+                    <h3>⏰ Hours</h3>
+                    <p>Monday - Friday: 10 AM - 6 PM<br>Saturday - Sunday: 11 AM - 5 PM</p>
+                </div>
+
+                <div class="info-box">
+                    <h3>💬 WhatsApp</h3>
+                    <p><a href="https://wa.me/447586181193" target="_blank">Chat with us on WhatsApp</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2024 Ellys by Elizabeth. All rights reserved.</p>
+        <p><a href="https://www.instagram.com/ellys_elizabeth?igsh=MWppa2dmamZoOTFrcA==" target="_blank">📱 Follow us on Instagram</a></p>
+    </footer>
+
+    <!-- CART MODAL -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCart()">&times;</span>
+            <h2>Shopping Cart</h2>
+            <div id="cartItemsList"></div>
+            <div class="cart-total">
+                <h3>Total: ₹<span id="cartTotal">0</span></h3>
+            </div>
+            <button onclick="checkout()" class="checkout-btn">Proceed to WhatsApp</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Load cart on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+        });
+    </script>
+</body>
+</html>

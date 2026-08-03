@@ -1,402 +1,313 @@
-const API_URL = 'http://localhost:5000/api'; // UPDATE THIS AFTER DEPLOYING BACKEND
+// ===== API CONFIGURATION =====
+// For local testing: http://localhost:3000/.netlify/functions
+// For Netlify: /.netlify/functions
+const API_BASE = '/.netlify/functions';
+
 const WHATSAPP_NUMBER = '447586181193';
 
-let cart = [];
-let sarees = [];
-let jewellery = [];
+// ===== CART MANAGEMENT =====
+let cart = JSON.parse(localStorage.getItem('ellysCart')) || [];
 
-// ===== FETCH SAREES =====
+function updateCartCount() {
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+        badge.textContent = cart.length;
+    }
+    toggleWhatsAppSection();
+}
+
+function addToCart(id, name, price, type) {
+    const item = { id, name, price, type };
+    cart.push(item);
+    localStorage.setItem('ellysCart', JSON.stringify(cart));
+    updateCartCount();
+    showNotification(`${name} added to cart! 🛒`);
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    localStorage.setItem('ellysCart', JSON.stringify(cart));
+    updateCartCount();
+    displayCart();
+}
+
+function openCart() {
+    displayCart();
+    document.getElementById('cartModal').style.display = 'block';
+}
+
+function closeCart() {
+    document.getElementById('cartModal').style.display = 'none';
+}
+
+function displayCart() {
+    const cartItemsDiv = document.getElementById('cartItemsList');
+    const cartTotalSpan = document.getElementById('cartTotal');
+
+    if (cart.length === 0) {
+        cartItemsDiv.innerHTML = '<p style="text-align: center; color: #999;">Your cart is empty</p>';
+        cartTotalSpan.textContent = '0';
+        return;
+    }
+
+    let total = 0;
+    cartItemsDiv.innerHTML = cart.map((item, index) => {
+        total += item.price;
+        return `
+            <div style="display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #eee; align-items: center;">
+                <div>
+                    <p><strong>${item.name}</strong></p>
+                    <p style="color: #666; font-size: 14px;">₹${item.price} (${item.type})</p>
+                </div>
+                <button onclick="removeFromCart(${index})" style="background: #d32f2f; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 5px;">Remove</button>
+            </div>
+        `;
+    }).join('');
+
+    cartTotalSpan.textContent = total;
+}
+
+function toggleWhatsAppSection() {
+    const whatsappButton = document.getElementById('whatsappButton');
+    if (whatsappButton) {
+        whatsappButton.style.display = cart.length > 0 ? 'block' : 'none';
+    }
+}
+
+function checkout() {
+    if (cart.length === 0) {
+        alert('Cart is empty!');
+        return;
+    }
+
+    const name = prompt('Enter your name:');
+    if (!name) return;
+
+    const email = prompt('Enter your email:');
+    if (!email) return;
+
+    const total = cart.reduce((sum, item) => sum + item.price, 0);
+    const cartSummary = cart.map(item => {
+        return `${item.type === 'saree' ? '👗' : '💎'} ${item.name} - ₹${item.price}`;
+    }).join('\n');
+
+    const message = `Hi Ellys,\n\nI would like to order:\n${cartSummary}\n\nTotal: ₹${total}\n\nCustomer Name: ${name}\nEmail: ${email}`;
+
+    // Send order confirmation email
+    sendOrderConfirmation(name, email, total, cartSummary);
+
+    // Open WhatsApp
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+
+    // Clear cart
+    cart = [];
+    localStorage.setItem('ellysCart', JSON.stringify(cart));
+    updateCartCount();
+    closeCart();
+}
+
+// ===== FETCH PRODUCTS =====
 async function fetchSarees() {
     try {
-        const response = await fetch(`${API_URL}/sarees`);
+        const response = await fetch(`${API_BASE}/sarees`);
         if (!response.ok) throw new Error('Failed to fetch sarees');
-        sarees = await response.json();
-        displaySarees();
+        const sarees = await response.json();
+        displaySarees(sarees);
     } catch (error) {
-        console.error('Error fetching sarees:', error);
-        sarees = [];
-        displaySarees();
+        console.error('Error:', error);
+        const grid = document.getElementById('sareesGrid');
+        if (grid) {
+            grid.innerHTML = '<p>Error loading sarees. Please refresh the page.</p>';
+        }
     }
 }
 
-// ===== FETCH JEWELLERY =====
 async function fetchJewellery() {
     try {
-        const response = await fetch(`${API_URL}/jewellery`);
+        const response = await fetch(`${API_BASE}/jewellery`);
         if (!response.ok) throw new Error('Failed to fetch jewellery');
-        jewellery = await response.json();
-        displayJewellery();
+        const jewellery = await response.json();
+        displayJewellery(jewellery);
     } catch (error) {
-        console.error('Error fetching jewellery:', error);
-        jewellery = [];
-        displayJewellery();
+        console.error('Error:', error);
+        const grid = document.getElementById('jewelleryGrid');
+        if (grid) {
+            grid.innerHTML = '<p>Error loading jewellery. Please refresh the page.</p>';
+        }
     }
 }
 
-// ===== DISPLAY SAREES =====
-function displaySarees() {
+// ===== DISPLAY PRODUCTS =====
+function displaySarees(sarees) {
     const grid = document.getElementById('sareesGrid');
     if (!grid) return;
     
-    grid.innerHTML = '';
-
     if (sarees.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No sarees available</p>';
+        grid.innerHTML = '<p style="text-align: center;">No sarees available.</p>';
         return;
     }
 
-    sarees.forEach(saree => {
-        const card = document.createElement('div');
-        card.className = 'saree-card';
-        card.innerHTML = `
-            <div class="saree-image">
-                <img src="${saree.image}" alt="${saree.name}" onerror="this.src='https://via.placeholder.com/280x350?text=${saree.name}'">
-            </div>
+    grid.innerHTML = sarees.map(saree => `
+        <div class="product-card">
+            <img src="${saree.image}" alt="${saree.name}" class="product-image">
             <h3>${saree.name}</h3>
-            <div class="price">₹${saree.price}</div>
-            <div class="rating">★★★★★</div>
-            <button class="btn btn-secondary" onclick="addToCart('${saree._id}', '${saree.name}', ${saree.price}, 'saree')">
-                Add to Cart
-            </button>
-        `;
-        grid.appendChild(card);
-    });
+            <p class="category">${saree.category}</p>
+            <p class="description">${saree.description.substring(0, 60)}...</p>
+            <div class="product-footer">
+                <span class="price">₹${saree.price}</span>
+                <button onclick="addToCart('${saree._id}', '${saree.name}', ${saree.price}, 'saree')" class="add-btn">Add to Cart</button>
+            </div>
+        </div>
+    `).join('');
 }
 
-// ===== DISPLAY JEWELLERY =====
-function displayJewellery() {
+function displayJewellery(jewellery) {
     const grid = document.getElementById('jewelleryGrid');
     if (!grid) return;
     
-    grid.innerHTML = '';
-
     if (jewellery.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No jewellery available</p>';
+        grid.innerHTML = '<p style="text-align: center;">No jewellery available.</p>';
         return;
     }
 
-    jewellery.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'jewellery-card';
-        card.innerHTML = `
-            <div class="jewellery-image">
-                <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/280x350?text=${item.name}'">
-            </div>
+    grid.innerHTML = jewellery.map(item => `
+        <div class="product-card">
+            <img src="${item.image}" alt="${item.name}" class="product-image">
             <h3>${item.name}</h3>
-            <p class="material">${item.material}</p>
-            <div class="price">₹${item.price}</div>
-            <div class="rating">★★★★★</div>
-            <button class="btn btn-secondary" onclick="addToCart('${item._id}', '${item.name}', ${item.price}, 'jewellery')">
-                Add to Cart
-            </button>
-        `;
-        grid.appendChild(card);
-    });
-}
-
-// ===== ADD TO CART =====
-function addToCart(id, name, price, type) {
-    cart.push({ id, name, price, type });
-    saveCart();
-    showNotification(`✓ ${name} added to cart!`);
-}
-
-// ===== SAVE CART =====
-function saveCart() {
-    localStorage.setItem('ellysCart', JSON.stringify(cart));
-    updateCartCount();
-    toggleWhatsAppSection();
-    renderCartItems();
-}
-
-// ===== UPDATE CART COUNT =====
-function updateCartCount() {
-    const cartBadge = document.getElementById('cartBadge');
-    const cartCount = document.getElementById('cartCount');
-    if (cartBadge) cartBadge.textContent = cart.length;
-    if (cartCount) cartCount.textContent = cart.length;
-}
-
-// ===== SHOW NOTIFICATION =====
-function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.className = 'cart-notification';
-    notification.innerHTML = message;
-    notification.style.cssText = `
-        position: fixed !important;
-        top: 100px !important;
-        right: 20px !important;
-        background: #8b1538 !important;
-        color: #fffaf0 !important;
-        padding: 1.2rem 1.8rem !important;
-        border-radius: 50px !important;
-        z-index: 1000 !important;
-        box-shadow: 0 5px 20px rgba(139, 21, 56, 0.4) !important;
-        font-weight: 500 !important;
-    `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
-}
-
-// ===== TOGGLE WHATSAPP SECTION =====
-function toggleWhatsAppSection() {
-    const section = document.getElementById('whatsappSection');
-    if (section) {
-        section.style.display = cart.length > 0 ? 'block' : 'none';
-    }
-}
-
-// ===== RENDER CART ITEMS =====
-function renderCartItems() {
-    const list = document.getElementById('cartItemsList');
-    if (!list) return;
-    
-    list.innerHTML = '';
-
-    if (cart.length === 0) {
-        list.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-        const total = document.getElementById('cartTotal');
-        if (total) total.textContent = '0';
-        return;
-    }
-
-    let total = 0;
-    cart.forEach((item, index) => {
-        total += item.price;
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
-            <div class="cart-item-details">
-                <div class="cart-item-name">${item.name}</div>
-                <div class="cart-item-type" style="font-size: 0.8rem; color: #666;">${item.type === 'saree' ? '👗 Saree' : '💎 Jewellery'}</div>
-                <div class="cart-item-price">₹${item.price}</div>
+            <p class="category">${item.category} • ${item.material}</p>
+            <p class="description">${item.description.substring(0, 60)}...</p>
+            <div class="product-footer">
+                <span class="price">₹${item.price}</span>
+                <button onclick="addToCart('${item._id}', '${item.name}', ${item.price}, 'jewellery')" class="add-btn">Add to Cart</button>
             </div>
-            <button class="cart-item-remove" onclick="removeFromCart(${index})">Remove</button>
-        `;
-        list.appendChild(div);
-    });
-
-    const totalElement = document.getElementById('cartTotal');
-    if (totalElement) totalElement.textContent = total;
+        </div>
+    `).join('');
 }
 
-// ===== REMOVE FROM CART =====
-function removeFromCart(index) {
-    cart.splice(index, 1);
-    saveCart();
-    if (cart.length === 0) {
-        const modal = document.getElementById('cartModal');
-        if (modal) modal.classList.remove('active');
-    }
-}
+// ===== CONTACT FORM =====
+async function sendContactMessage(event) {
+    event.preventDefault();
 
-// ===== GENERATE WHATSAPP MESSAGE =====
-function generateWhatsAppMessage() {
-    if (cart.length === 0) {
-        alert('Your cart is empty!');
-        return null;
-    }
-
-    let message = 'Hello! I would like to order from Ellys by Elizabeth:\n\n';
-    let total = 0;
-
-    cart.forEach((item, index) => {
-        const type = item.type === 'saree' ? '👗' : '💎';
-        message += `${index + 1}. ${type} ${item.name} - ₹${item.price}\n`;
-        total += item.price;
-    });
-
-    message += `\nTotal: ₹${total}\n\nPlease confirm availability and provide payment details.`;
-    return encodeURIComponent(message);
-}
-
-// ===== SEND ORDER CONFIRMATION EMAIL =====
-async function sendOrderConfirmation(email, customerName) {
-    if (cart.length === 0) return;
-
-    let total = 0;
-    const items = cart.map(item => {
-        total += item.price;
-        return item;
-    });
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
 
     try {
-        const response = await fetch(`${API_URL}/send-order-confirmation`, {
+        const response = await fetch(`${API_BASE}/contact`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, subject, message })
+        });
+
+        if (response.ok) {
+            showNotification('Message sent successfully! ✅');
+            document.getElementById('contactForm').reset();
+        } else {
+            showNotification('Error sending message. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error: ' + error.message);
+    }
+}
+
+// ===== ORDER CONFIRMATION EMAIL =====
+async function sendOrderConfirmation(name, email, total, cartSummary) {
+    try {
+        await fetch(`${API_BASE}/order-confirmation`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                email: email,
-                customerName: customerName,
-                items: items,
-                total: total
+                customerName: name,
+                customerEmail: email,
+                total: total,
+                items: cartSummary
             })
         });
-
-        const result = await response.json();
-        if (result.success) {
-            console.log('✅ Order confirmation email sent!');
-        }
     } catch (error) {
-        console.error('Error sending order confirmation:', error);
+        console.error('Error sending confirmation email:', error);
     }
 }
 
-// ===== CART MODAL =====
-const cartIcon = document.getElementById('cartIcon');
-if (cartIcon) {
-    cartIcon.addEventListener('click', () => {
-        if (cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-        const modal = document.getElementById('cartModal');
-        if (modal) modal.classList.add('active');
-    });
+// ===== NOTIFICATIONS =====
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #8b1538;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 
-const closeCart = document.getElementById('closeCart');
-if (closeCart) {
-    closeCart.addEventListener('click', () => {
-        const modal = document.getElementById('cartModal');
-        if (modal) modal.classList.remove('active');
-    });
-}
-
-const cartModal = document.getElementById('cartModal');
-if (cartModal) {
-    cartModal.addEventListener('click', (e) => {
-        if (e.target.id === 'cartModal') {
-            cartModal.classList.remove('active');
-        }
-    });
-}
-
-// ===== WHATSAPP CHECKOUT =====
-const whatsappBtn = document.getElementById('whatsappBtn');
-if (whatsappBtn) {
-    whatsappBtn.addEventListener('click', () => {
-        if (cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-
-        const name = prompt('Enter your name:');
-        if (!name) return;
-
-        const email = prompt('Enter your email for order confirmation:');
-        if (!email) return;
-
-        // Validate email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            alert('Please enter a valid email address');
-            return;
-        }
-
-        // Send order confirmation email
-        sendOrderConfirmation(email, name);
-
-        // Generate and send WhatsApp message
-        const message = generateWhatsAppMessage();
-        if (message) {
-            setTimeout(() => {
-                window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
-            }, 1000);
-        }
-    });
-}
-
-const checkoutBtn = document.getElementById('checkoutBtn');
-if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', () => {
-        if (cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-
-        const name = prompt('Enter your name:');
-        if (!name) return;
-
-        const email = prompt('Enter your email for order confirmation:');
-        if (!email) return;
-
-        // Validate email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            alert('Please enter a valid email address');
-            return;
-        }
-
-        // Send order confirmation email
-        sendOrderConfirmation(email, name);
-
-        // Generate and send WhatsApp message
-        const message = generateWhatsAppMessage();
-        if (message) {
-            setTimeout(() => {
-                window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
-            }, 1000);
-        }
-    });
-}
-
-// ===== CONTACT FORM WITH EMAIL =====
-const contactForm = document.getElementById('contactForm');
-if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const subject = document.getElementById('subject').value;
-        const message = document.getElementById('message').value;
-
-        try {
-            const response = await fetch(`${API_URL}/contact`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    subject: subject,
-                    message: message
-                })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                showNotification('✅ Message sent! Check your email for confirmation.');
-                contactForm.reset();
-            } else {
-                alert('Message sent successfully! We will contact you soon.');
-                contactForm.reset();
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            // Even if there's an error, show success message as fallback
-            alert('✅ Message received! We will contact you soon.');
-            contactForm.reset();
-        }
-    });
-}
-
-// ===== PAGE LOAD =====
-document.addEventListener('DOMContentLoaded', () => {
-    const saved = localStorage.getItem('ellysCart');
-    if (saved) {
-        try {
-            cart = JSON.parse(saved);
-        } catch (e) {
-            cart = [];
-        }
+// ===== CLOSE MODAL ON OUTSIDE CLICK =====
+window.onclick = function(event) {
+    const modal = document.getElementById('cartModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
     }
+}
+
+// ===== INITIALIZE PAGE =====
+document.addEventListener('DOMContentLoaded', function() {
     updateCartCount();
-    toggleWhatsAppSection();
-    fetchSarees();
-    fetchJewellery();
+    
+    // Load products if on product pages
+    if (document.getElementById('sareesGrid')) {
+        fetchSarees();
+    }
+    if (document.getElementById('jewelleryGrid')) {
+        fetchJewellery();
+    }
+    
+    // Setup contact form if on contact page
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', sendContactMessage);
+    }
+    
+    console.log('✅ Store loaded successfully!');
+    console.log('API Base:', API_BASE);
 });
 
-console.log('✅ Frontend loaded successfully!');
-console.log('📍 API URL:', API_URL);
-console.log('📧 Email support: Enabled');
+// ===== ANIMATIONS =====
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);

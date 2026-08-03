@@ -1,8 +1,7 @@
 // ===== LOGIN CREDENTIALS =====
 // These must match your .env file!
 const ADMIN_ID = 'ellys_admin';
-const ADMIN_PASSWORD = 'Ellys@2024!SecureAdmin123';
-
+const ADMIN_PASSWORD = '';
 // ===== API CONFIGURATION =====
 const API_URL = 'http://localhost:5000/api'; // UPDATE AFTER DEPLOYING TO NETLIFY
 const ADMIN_HEADER = { 'x-admin-password': ADMIN_PASSWORD };
